@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>Sofisoft.Accounts.Identity.API</AssemblyName>
+    <RootNamespace>Sofisoft.Accounts.Identity.API</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1705;1591;1572;1571;1573;1587;1570</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1701;1702;1705;1591;1572;1571;1573;1587;1570</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0"/>
+    <PackageReference Include="Azure.Extensions.AspNetCore.DataProtection.Blobs" Version="1.2.1"/>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="10.3.3"/>
+    <PackageReference Include="MongoDB.Bson" Version="2.13.1"/>
+    <PackageReference Include="MongoDB.Driver" Version="2.13.1"/>
+    <PackageReference Include="MongoDB.Driver.Core" Version="2.13.1"/>
+    <PackageReference Include="OpenIddict.AspNetCore" Version="3.1.1"/>
+    <PackageReference Include="Sofisoft.Enterprise.SeedWork.MongoDB" Version="1.0.2"/>
+  </ItemGroup>
+</Project>

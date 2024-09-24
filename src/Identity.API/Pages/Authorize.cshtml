@@ -1,0 +1,96 @@
+@page
+@{
+  Layout = null;
+}
+@{
+    ViewData["Title"] = "Autorización";
+}
+
+<form id="form-id" encType="application/x-www-form-urlencoded" method="post">
+    <input id="txtAuthuser" name="authuser" type="text"/>
+    <input id="txtClienteId" name="client_id" type="text"/>
+    <input id="txtRedirectUri" name="redirect_uri" type="text"/>
+    <input id="txtCompanyId" name="company_id" type="text"/>
+    <input id="txtResponseType" name="response_type" type="text"/>
+    <input id="txtScope" name="scope" type="text"/>
+    <input id="txtNonce" name="nonce" type="text"/>
+    <input id="txtState" name="state" type="text"/>
+    <input id="btnPermitir" name="submit.Accept" type="submit" />
+</form>
+
+<script type="text/javascript">
+    window.common = (function () {
+        var common = {};
+
+        common.sendAuthorizacion = async () => {
+            var urlParams = new URLSearchParams(window.location.search),
+                authuser = urlParams.get('authuser') || '0',
+                clientId = urlParams.get('client_id');
+                
+            authuser = authuser === 'null' ? '0' : authuser;
+
+            document.getElementById("form-id").action = `${window.location.origin}/connect/authorize`;
+            document.getElementById("txtAuthuser").value = authuser;
+            document.getElementById("txtClienteId").value = clientId;
+            document.getElementById("txtCompanyId").value = urlParams.get('company_id');
+            document.getElementById("txtRedirectUri").value = urlParams.get('redirect_uri');
+            document.getElementById("txtResponseType").value = urlParams.get('response_type');
+            document.getElementById("txtScope").value = urlParams.get('scope');
+            document.getElementById("txtNonce").value = urlParams.get('nonce');
+            document.getElementById("txtState").value = urlParams.get('state');
+
+            try {
+                var response = await fetch(`${window.location.origin}/oauth/check?clientId=${clientId}&authuser=${authuser}`);
+
+                if(typeof response === typeof{} && response.status === 401){
+                    parent.postMessage({
+                        status: response.status,
+                        error: response.statusText 
+                    }, new URL(urlParams.get('redirect_uri')).origin);
+                    
+                    return;
+                }
+                
+                var data = await response.json();
+
+                if(typeof response === typeof{} && response.status === 400){
+                    parent.postMessage({ 
+                        status: response.status,
+                        error: data 
+                    }, new URL(urlParams.get('redirect_uri')).origin);
+                    
+                    return;
+                }
+
+                if(data.hasAccess && data.permitted) {
+                    document.getElementById("btnPermitir").click();
+                }
+                else if(data.hasAccess === false) {
+                    parent.postMessage({ 
+                        status: 400,
+                        error: { message: 'No tiene acceso a la aplicación.' }
+                    }, new URL(urlParams.get('redirect_uri')).origin);
+                }
+                else {
+                    parent.postMessage({ 
+                        status: 400,
+                        error: { message: 'Debe autorizar la aplicación para usar información de su cuenta.' }
+                    }, new URL(urlParams.get('redirect_uri')).origin);
+                }
+            } catch (error) {
+                if(error.response) {
+                    if(error.response.status === 401) {
+                        parent.postMessage({ 
+                            status: error.response.status, 
+                            error: error.response.status.statusText
+                        }, new URL(urlParams.get('redirect_uri')).origin);
+                    }
+                }
+            }
+        };
+
+        return common;
+    })();
+
+    window.common.sendAuthorizacion();
+</script>
